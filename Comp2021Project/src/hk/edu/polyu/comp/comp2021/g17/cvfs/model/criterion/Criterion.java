@@ -8,7 +8,7 @@ public abstract class Criterion{
 	Op op;
 	Object val;
 	
-	public Criterion(String name, AttrName attrname, Op op, Object val) throws IllegalArgumentException {
+	protected Criterion(String name, AttrName attrname, Op op, Object val) throws IllegalArgumentException {
 		if (!isValidCriName(name) || !isValidCri(attrname, op, val)) throw new IllegalArgumentException("Invalid argument combination is passed on creating criterion");
 		this.name = name;
 		this.attrname = attrname;

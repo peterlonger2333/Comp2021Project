@@ -5,15 +5,8 @@ import java.util.Iterator;
 
 import hk.edu.polyu.comp.comp2021.g17.cvfs.model.exception.FileAlreadyExistException;
 import hk.edu.polyu.comp.comp2021.g17.cvfs.model.exception.FileNotExistException;
+import hk.edu.polyu.comp.comp2021.g17.cvfs.model.exception.IllegalOperationException;
 import hk.edu.polyu.comp.comp2021.g17.cvfs.model.exception.InvalidFileNameException;
-
-
-@SuppressWarnings("serial")
-class IllegalOperationException extends Exception{
-	public IllegalOperationException(String msg) {
-		super(msg);
-	}
-}
 
 class Dirent implements Iterable<File>{
 	//A Dirent is a dictionary

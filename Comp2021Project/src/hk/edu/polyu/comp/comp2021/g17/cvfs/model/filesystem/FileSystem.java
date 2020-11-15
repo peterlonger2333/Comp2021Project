@@ -19,10 +19,6 @@ public class FileSystem {
 	ArrayList<Criterion> criteria;
 	ArrayList<String> commandHistory;
 	
-	public static void main(String[] args) {
-		new FileSystem();
-	}
-	
 	public FileSystem() {
 		//TODO
 		//Calling constructor is when the system is entered. Interaction begins here
