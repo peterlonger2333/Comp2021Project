@@ -12,7 +12,7 @@ public class Document extends File{
 	
 	/**
 	 * get the type of this document file
-	 * @return DocumentType
+	 * @return DocumentType of the document
 	 */
 	public DocumentType getDocumentType() {
 		return type;
