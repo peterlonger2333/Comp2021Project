@@ -72,8 +72,6 @@ public class Directory extends File{
 		try {
 			dir.put(".",this);
 			dir.put("..",parent);
-			this.size += 80; 
-			//TODO don't know if this is correct 
 		} catch (FileAlreadyExistException e) {
 			//This exception is never triggered
 			e.printStackTrace();
