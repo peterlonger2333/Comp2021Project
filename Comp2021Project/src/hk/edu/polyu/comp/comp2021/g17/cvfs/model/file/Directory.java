@@ -58,7 +58,7 @@ class Dirent implements Iterable<File>{
 public class Directory extends File{
 	
 	Directory parent; //Keep a pointer to its parent for easy tracing-up
-	Dirent content; //Get a content fielf for itself so we don't need to cast every time we use the dirent
+	Dirent content; //Get a content field for itself so we don't need to cast every time we use the dirent
 	/**
 	 * Constructor, pass in name and its parent
 	 * @param name
@@ -88,7 +88,7 @@ public class Directory extends File{
 	 * @param content
 	 * @param type
 	 */
-	public void newDoc(String name, String content, DocumentType type) {
+	public void newDoc(String name, String content, DocumentType type) throws FileAlreadyExistException {
 		//TODO create a document and add it to directory entry
 		//remember to increase the sizes of the directory and its parent and so on... up to root, whose parent is null
 	}
@@ -97,10 +97,9 @@ public class Directory extends File{
 	 * add a new directory to the entry
 	 * @param name
 	 */
-	public void newDir(String name) {
+	public void newDir(String name) throws FileAlreadyExistException{
 		//TODO add a new Directory to the entry
-		//remember to initialize the directory (add "." and "..")
-		//and configure the sizes (of itself, its parent, ... up to root
+		//adjust size
 	}
 	
 	/**
@@ -108,7 +107,7 @@ public class Directory extends File{
 	 * @param name
 	 * @throws IllegalOperationException
 	 */
-	public void delete(String name) throws IllegalOperationException{
+	public void delete(String name) throws FileNotExistException, IllegalOperationException{
 		//TODO delete a file from the entry with name name
 		//remember to correct the sizes
 		//also note that it can't delete "." and "..", an exception shall be thrown if such cases occur
@@ -119,7 +118,7 @@ public class Directory extends File{
 	 * @param oldName
 	 * @param newName
 	 */
-	public void rename(String oldName, String newName) {
+	public void rename(String oldName, String newName) throws FileNotExistException{
 		//TODO rename the file(dir or doc)
 	}
 	
@@ -147,5 +146,10 @@ public class Directory extends File{
 	 */
 	public void rList() {
 		//TODO list all entry names in dirent, follow the all directories except "." and ".."
+	}
+	
+	public String toString() {
+		//TODO output should be in this format: [.,..,dir1,doc1, ...]
+		return null;
 	}
 }
