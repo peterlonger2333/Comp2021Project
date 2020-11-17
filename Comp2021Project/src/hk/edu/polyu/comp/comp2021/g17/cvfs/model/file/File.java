@@ -34,10 +34,11 @@ public abstract class File {
 	/**
 	 * check is the file name is legal
 	 * @return
+	 * hi！ i don't know if i am correct : name != null 
 	 */
 	private boolean isNameLegal(String name){
 		//TODO
-		if (name.length() <= 10) {
+		if ( name != null && name.length() <= 10) {
 			for (int i = 0; i < name.length(); i++) {
 				if (!isLetterOrDigit(name.charAt(i)) ) {
 					return false;
