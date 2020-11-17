@@ -17,13 +17,29 @@ public abstract class Criterion{
 	}
 	
 	/**
+	 * check if a character variable is letter 
+	 * @param temp
+	 * @return true if character is letter, false otherwise
+	 */
+	private boolean isLetter(char character) {
+		int code = (int)character;
+		if ((code >= 65 && code <=90) || (code >= 97 && code <= 122)) {
+			return true;
+		}
+		return false;
+	}
+	
+	/**
 	 * check if name is valid
 	 * @param name
 	 * @return true if name is valid, false otherwise
 	 */
 	private boolean isValidCriName(String name) {
 		//TODO 
-		return true;
+		if (name.length() == 2) {
+			if (isLetter(name.charAt(0)) && isLetter(name.charAt(1))) {return true;}
+			}
+		return false;
 	}
 	
 	/**
