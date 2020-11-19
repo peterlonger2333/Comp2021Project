@@ -7,6 +7,9 @@ import java.util.Scanner;
 
 import hk.edu.polyu.comp.comp2021.g17.cvfs.model.criterion.Criterion;
 import hk.edu.polyu.comp.comp2021.g17.cvfs.model.exception.DiskMemoryNotEnoughException;
+import hk.edu.polyu.comp.comp2021.g17.cvfs.model.exception.FileAlreadyExistException;
+import hk.edu.polyu.comp.comp2021.g17.cvfs.model.exception.FileNotExistException;
+import hk.edu.polyu.comp.comp2021.g17.cvfs.model.exception.IllegalOperationException;
 import hk.edu.polyu.comp.comp2021.g17.cvfs.model.exception.InvalidArgumentException;
 import hk.edu.polyu.comp.comp2021.g17.cvfs.model.exception.UsageException;
 import hk.edu.polyu.comp.comp2021.g17.cvfs.model.file.Disk;
@@ -109,7 +112,7 @@ public class FileSystem {
 		
 	}
 	
-	public  void delete(String args) throws UsageException {
+	public  void delete(String args) throws UsageException, FileNotExistException {
 		Scanner sc = new Scanner(args);
 		try {
 			String name = sc.next();
@@ -121,7 +124,7 @@ public class FileSystem {
 		}
 	}
 	
-	public  void rename(String args) throws UsageException {
+	public  void rename(String args) throws UsageException, FileNotExistException, FileAlreadyExistException {
 		Scanner sc = new Scanner(args);
 		try {
 			String oldName = sc.next();
@@ -134,7 +137,7 @@ public class FileSystem {
 		}
 	}
 	
-	public  void changeDir(String args) throws InvalidArgumentException, UsageException {
+	public  void changeDir(String args) throws  UsageException, IllegalOperationException {
 		Scanner sc = new Scanner(args);
 		try {
 			String name = sc.next();

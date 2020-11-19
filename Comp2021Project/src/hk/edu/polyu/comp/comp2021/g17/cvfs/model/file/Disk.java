@@ -3,6 +3,9 @@ package hk.edu.polyu.comp.comp2021.g17.cvfs.model.file;
 import java.util.LinkedList;
 
 import hk.edu.polyu.comp.comp2021.g17.cvfs.model.exception.DiskMemoryNotEnoughException;
+import hk.edu.polyu.comp.comp2021.g17.cvfs.model.exception.FileAlreadyExistException;
+import hk.edu.polyu.comp.comp2021.g17.cvfs.model.exception.FileNotExistException;
+import hk.edu.polyu.comp.comp2021.g17.cvfs.model.exception.IllegalOperationException;
 import hk.edu.polyu.comp.comp2021.g17.cvfs.model.exception.InvalidArgumentException;
 import hk.edu.polyu.comp.comp2021.g17.cvfs.model.exception.InvalidFileNameException;
 
@@ -32,9 +35,9 @@ public class Disk {
 	/**
 	 * Change current working directory to the directory with name name
 	 * @param name
-	 * @throws InvalidArgumentException
+	 * @throws IllegalOperationException
 	 */
-	public void changeDir(String name) throws InvalidArgumentException{
+	public void changeDir(String name) throws IllegalOperationException{
 		//TODO
 		//Be sure to check the type of the file is a Directory
 		//Throw an exception if it is a Document
@@ -45,7 +48,7 @@ public class Disk {
 	 * Return the path as a string
 	 * @return
 	 */
-	public String showPath() {
+	public String toString() {
 		//TODO
 		//'toString' the path in a desired format
 		return null;
@@ -75,7 +78,7 @@ public class Disk {
 	 * Delete the file with name name in current working directory
 	 * @param name
 	 */
-	public void delete(String name) {
+	public void delete(String name) throws FileNotExistException {
 		//TODO
 	}
 	
@@ -84,7 +87,7 @@ public class Disk {
 	 * @param oldName
 	 * @param newName
 	 */
-	public void rename(String oldName, String newName) {
+	public void rename(String oldName, String newName) throws FileNotExistException, FileAlreadyExistException{
 		//TODO
 	}
 	
