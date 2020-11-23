@@ -2,6 +2,7 @@ package hk.edu.polyu.comp.comp2021.g17.cvfs.model.filesystem;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
@@ -14,14 +15,15 @@ import hk.edu.polyu.comp.comp2021.g17.cvfs.model.exception.InvalidArgumentExcept
 import hk.edu.polyu.comp.comp2021.g17.cvfs.model.exception.UsageException;
 import hk.edu.polyu.comp.comp2021.g17.cvfs.model.file.Disk;
 import hk.edu.polyu.comp.comp2021.g17.cvfs.model.file.DocumentType;
+import hk.edu.polyu.comp.comp2021.g17.cvfs.model.file.File;
 
-//somecode
-//羡~
+
 public class FileSystem {
 	ArrayList<Disk> disks;
 	Disk currentDisk;
-	ArrayList<Criterion> criteria;
+	HashMap<String,Criterion> criteria;
 	ArrayList<String> commandHistory;
+	int commandPointer = -1; //points to last command
 	
 	public FileSystem() {
 		//TODO
@@ -45,7 +47,15 @@ public class FileSystem {
 					
 					try {
 						Method m = Class.forName("fileSystem.FileSystem").getMethod(commandName,String.class);
+						
 						m.invoke(args); //this swallows all exceptions!!!
+						
+						//Operation succeed, store the command in history
+						if (commandName.compareTo("undo") != 0 && commandName.compareTo("redo") != 0) {
+							commandHistory.add(commandName + " " + args);
+							commandPointer++;
+						}
+						
 					} catch(NoSuchMethodException e) {
 						//this exception should never be triggered
 						e.printStackTrace();
@@ -167,28 +177,115 @@ public class FileSystem {
 		}
 	}
 	
-	public  void newSimpleCri(String args) {
-		//TODO
+	public  void newSimpleCri(String args) throws UsageException, InvalidArgumentException {
+		Scanner sc = new Scanner(args);
+		
+		try {
+			String[] argStrings = new String[4];
+			for (int i=0; i<4; i++) {
+				argStrings[i] = sc.next();
+			}
+			
+			criteria.put(argStrings[0], Criterion.newSimpleCri(argStrings[0],argStrings[1],argStrings[2],argStrings[3]));
+		}catch(NoSuchElementException nsee) {
+			throw new UsageException("Usage: newSimpleCri <name, attrname, oprator, oprand>");
+		}finally {
+			sc.close();
+		}
+		
 	}
 	
-	public  void newNegation(String args) {
-		//TODO
+	public  void newNegation(String args) throws UsageException, InvalidArgumentException {
+		Scanner sc = new Scanner(args);
+		
+		try {
+			String negName = sc.next();
+			if (criteria.get(negName) != null) throw new InvalidArgumentException(negName + " already exists");
+			String toNegName = sc.next();
+			Criterion toNegCri = criteria.get(toNegName);
+			if (toNegCri == null) throw new InvalidArgumentException("No criterion: " + toNegName);
+			criteria.put(negName, Criterion.newNegation(negName, toNegCri));
+		}catch(NoSuchElementException nsee) {
+			throw new UsageException("Usage: newNegation <name, criterion>");
+		}finally {
+			sc.close();
+		}
 	}
 	
-	public  void newBinaryCri(String args) {
-		//TODO
+	public  void newBinaryCri(String args) throws UsageException, InvalidArgumentException {
+		Scanner sc = new Scanner(args);
+		
+		try {
+			String[] argStrings = new String[4];
+			for (int i=0; i<4; i++) {
+				argStrings[i] = sc.next();
+			}
+			
+			Criterion cri1 = criteria.get(argStrings[1]);
+			Criterion cri2 = criteria.get(argStrings[2]);
+			
+			if (cri1 == null) throw new InvalidArgumentException(argStrings[1] + " does not exist");
+			if (cri2 == null) throw new InvalidArgumentException(argStrings[2] + " does not exist");
+			
+			criteria.put(argStrings[0],Criterion.newBinaryCri(argStrings[0], cri1, cri2, argStrings[3]));
+		}catch(NoSuchElementException nsee) {
+			throw new UsageException("Usage: newBinaryCri <name, cri1, cri2, binaryOperator>");
+		}finally {
+			sc.close();
+		}
 	}
 	
-	public  void printAllCriteria(String args) {
-		//TODO
+	public  void printAllCriteria(String args) throws UsageException {
+		@SuppressWarnings("resource")
+		Scanner sc = new Scanner(args);
+
+		if (sc.hasNext()) throw new UsageException("Usage: printAllCriteria <>");
+		
+		for (Criterion c : criteria.values()) {
+			System.out.println(c.toString());
+		}
 	}
 	
-	public  void search(String args) {
-		//TODO
+	public  void search(String args) throws UsageException, InvalidArgumentException {
+		Scanner sc = new Scanner(args);
+		
+		try {
+			String criName = sc.next();
+			Criterion cri = criteria.get(criName);
+			if (cri == null) throw new InvalidArgumentException("Criterion '" + criName + "' does not exist");
+			
+			ArrayList<File> files = currentDisk.getFiles();
+			
+			for (File f : files) {
+				if(cri.assertCri(f)) System.out.println(f.toString());
+			}
+			
+		}catch(NoSuchElementException nsee) {
+			throw new UsageException("Usage: search <criName>");
+		}finally {
+			sc.close();
+		}
 	}
 	
-	public  void rSearch(String args) {
-		//TODO
+	public  void rSearch(String args) throws InvalidArgumentException, UsageException {
+		Scanner sc = new Scanner(args);
+		
+		try {
+			String criName = sc.next();
+			Criterion cri = criteria.get(criName);
+			if (cri == null) throw new InvalidArgumentException("Criterion '" + criName + "' does not exist");
+			
+			ArrayList<File> files = currentDisk.rGetFiles();
+			
+			for (File f : files) {
+				if(cri.assertCri(f)) System.out.println(f.toString());
+			}
+			
+		}catch(NoSuchElementException nsee) {
+			throw new UsageException("Usage: rSearch <criName>");
+		}finally {
+			sc.close();
+		}
 	}
 	
 	public  void store(String args) {
@@ -199,11 +296,4 @@ public class FileSystem {
 		//TODO
 	}
 	
-	public  void undo(String args) {
-		//TODO
-	}
-	
-	public  void redo(String args) {
-		//TODO
-	}
 }
