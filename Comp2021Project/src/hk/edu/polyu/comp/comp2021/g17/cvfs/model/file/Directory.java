@@ -80,6 +80,10 @@ public class Directory extends File{
 		}
 		super.content = dir; //redundant ?
 		//this.content = dir;
+		if(this.parent != null){
+			this.parent.content.put(name,this);
+			changeSize(this.parent, this,'+');
+		}
 	}
 
 	/**
@@ -154,8 +158,7 @@ public class Directory extends File{
 		//remember to initialize the directory (add "." and "..")
 		//and configure the sizes (of itself, its parent, ... up to root
 		Directory newdir = new Directory(name,this);
-		this.content.put(name,newdir);
-		changeSize(this, newdir,'+');
+
 	}
 	
 	/**
@@ -186,7 +189,7 @@ public class Directory extends File{
 	public void rename(String oldName, String newName) throws FileNotExistException, FileAlreadyExistException, InvalidFileNameException {
 		//TODO rename the file(dir or doc)
 		File toChangeName = content.get(oldName);
-		if(isNameLegal(newName)) throw new InvalidFileNameException("Invalid name.");
+		if(!isNameLegal(newName)) throw new InvalidFileNameException("Invalid name.");
 		toChangeName.name = newName; // not sure if this will work
 		content.remove(oldName);
 		content.put(newName,toChangeName);
@@ -198,9 +201,10 @@ public class Directory extends File{
 	 * @return Directory with name
 	 * @throws FileNotExistException
 	 */
-	public Directory findDir(String name) throws FileNotExistException {
+	public Directory findDir(String name) throws FileNotExistException, InvalidArgumentException {
 		//TODO find from the dirent the directory with name name and return it
 		//a cast is needed since we want a Directory not just a File
+		if (this.content.get(name).getClass() != this.getClass()) throw new InvalidArgumentException("Not a directory.");
 		return (Directory) this.content.get(name);
 	}
 
@@ -210,9 +214,10 @@ public class Directory extends File{
 	 * @return Document with name
 	 * @throws FileNotExistException
 	 */
-	public Document findDoc(String name) throws FileNotExistException {
+	public Document findDoc(String name) throws FileNotExistException, InvalidArgumentException {
 		//TODO find from the dirent the directory with name name and return it
 		//a cast is needed since we want a Directory not just a File
+		if (this.content.get(name).getClass() == this.getClass()) throw new InvalidArgumentException("Not a document.");
 		return (Document) this.content.get(name);
 	}
 
@@ -286,7 +291,8 @@ public class Directory extends File{
 		System.out.println("\nTotal number of files: " + number);
 		System.out.println("Total sizes of files: " + this.getSize());
 	}
-	/* print the parent
+	
+	//print the parent
 	public String toString() {
 		//TODO output should be in this format: [.,..,dir1,doc1, ...]
 		StringBuilder sb = new StringBuilder();
