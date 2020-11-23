@@ -233,21 +233,22 @@ public class Directory extends File{
 		return (Document) this.content.get(name);
 	}
 
+	
 	/**
 	 * list all files directly in this directory
 	 * @throws FileNotExistException
 	 */
-	public void list() throws FileNotExistException, InvalidFileNameException {
+	public void list() throws FileNotExistException, InvalidFileNameException, IllegalOperationException {
 		//TODO list all entry names in dirent, but do not get into a directory
 		//note that dirent is iterable
 		//it is ok to print the .txt .css in this file
 		Iterator<String> it = this.content.keyIterator();
 		it.next();
 		it.next();
-		Document temp = new Document("temp",DocumentType.txt,null);
+		Document temp = new Document("temp",DocumentType.txt,"");
 		int number = 0, size = 0;
 		//it.next();
-		System.out.println("In directory " + this.getName() + ": ");
+		System.out.println("\nIn directory " + this.getName() + ": ");
 		while (it.hasNext()){
 			String itFile = it.next();
 			if(content.get(itFile).getClass() == this.getClass()){
@@ -270,21 +271,22 @@ public class Directory extends File{
 	 * @param blank
 	 * @throws FileNotExistException
 	 */
-	public int dList(Directory dir,String blank) throws FileNotExistException {
+	public int dList(Directory dir,String blank) throws FileNotExistException, IllegalOperationException {
 		int count = 0;
 		Iterator<String> it = dir.content.keyIterator();
 		blank += "  ";
 		it.next();
 		it.next();
 		while(it.hasNext()){
-			if (dir.content.dirent.get(it.next()).getClass() == dir.getClass()){
-				Directory other = (Directory) dir.content.dirent.get(it.next());
+			String itFile = it.next();
+			if (dir.content.get(itFile).getClass() == dir.getClass()){
+				Directory other = (Directory) dir.content.get(itFile);
 				System.out.println(blank + "Directory: " + other.getName() + " | Size: " + other.content.getSize() );
 				count += dList(other,blank);
 			}
 			else{
-				System.out.println(blank + "File: " + dir.content.get(it.next()) + " | Type: " + dir.content.get(it.next()).type +
-						" | Size: " + dir.content.get(it.next()).getSize() );
+				System.out.println(blank + "File: " + dir.content.get(itFile).getName() + " | Type: " + dir.content.get(itFile).type +
+						" | Size: " + dir.content.get(itFile).getSize() );
 			}
 			count++;
 		}
@@ -294,17 +296,16 @@ public class Directory extends File{
 	/**
 	 * recursively list all files
 	 */
-	public void rList() throws FileNotExistException {
+	public void rList() throws FileNotExistException, IllegalOperationException {
 		//TODO list all entry names in dirent, follow the all directories except "." and ".."
 		int number = 0;
 		String blank = "";
-		System.out.println("In directory " + this.getName() + ": ");
+		System.out.println("\nIn directory " + this.getName() + ": ");
 		number += dList(this,blank);
 		System.out.println("\nTotal number of files: " + number);
 		System.out.println("Total sizes of files: " + this.getSize());
 	}
-	
-	//print the parent
+	// print the parent
 	public String toString() {
 		//TODO output should be in this format: [.,..,dir1,doc1, ...]
 		StringBuilder sb = new StringBuilder();
@@ -315,12 +316,12 @@ public class Directory extends File{
 		while (it.hasNext()){
 			String itFile = it.next();
 			sb.append(itFile);
-			sb.append(",");
+			if (it.hasNext())
+				sb.append(",");
 		}
-		sb.deleteCharAt(sb.lastIndexOf(","));
 		sb.append("]");
 		return sb.toString();
-	}*/
+	}
 	
 	public ArrayList<File> getFiles(){
 		ArrayList<File> result = new ArrayList<File>();
