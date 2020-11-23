@@ -1,5 +1,6 @@
 package hk.edu.polyu.comp.comp2021.g17.cvfs.model.file;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 import hk.edu.polyu.comp.comp2021.g17.cvfs.model.exception.DiskMemoryNotEnoughException;
@@ -106,5 +107,13 @@ public class Disk {
 	 */
 	public void rList() {
 		//TODO
+	}
+	
+	public ArrayList<File> getFiles(){
+		return null;
+	}
+	
+	public ArrayList<File> rGetFiles(){
+		return null;
 	}
 }

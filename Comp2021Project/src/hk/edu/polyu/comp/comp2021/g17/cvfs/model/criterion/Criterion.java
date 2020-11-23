@@ -135,7 +135,9 @@ public abstract class Criterion{
 		};
 	}
 	
-	public static Criterion newBinaryCri(String name, Criterion c1, Criterion c2, Op bo) throws IllegalArgumentException {
+	public static Criterion newBinaryCri(String name, Criterion c1, Criterion c2, String boString) throws IllegalArgumentException, InvalidArgumentException {
+		
+		Op bo = string2Op(boString);
 		return new Criterion(name, AttrName.composite, bo, c1.name + " " + c2.name) {
 			public boolean assertCri(File file) {
 				switch (bo) {
