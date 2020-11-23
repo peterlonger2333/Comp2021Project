@@ -8,9 +8,6 @@ class NameCri extends Criterion{
 	}
 
 	public boolean assertCri(File file) {
-		// TODO 
-		//return true if file name contains checkName
-		//false otherwise
-		return false;
+		return super.val.toString().contains(file.getName());
 	}
 }

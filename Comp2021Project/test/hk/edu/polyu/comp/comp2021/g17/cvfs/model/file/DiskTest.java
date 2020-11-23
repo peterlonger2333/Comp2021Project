@@ -3,9 +3,7 @@ package hk.edu.polyu.comp.comp2021.g17.cvfs.model.file;
 import static java.time.Duration.ofMillis;
 import static org.junit.jupiter.api.Assertions.*;
 
-import javax.print.Doc;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 
@@ -14,7 +12,6 @@ import hk.edu.polyu.comp.comp2021.g17.cvfs.model.exception.FileAlreadyExistExcep
 import hk.edu.polyu.comp.comp2021.g17.cvfs.model.exception.FileNotExistException;
 import hk.edu.polyu.comp.comp2021.g17.cvfs.model.exception.IllegalOperationException;
 import hk.edu.polyu.comp.comp2021.g17.cvfs.model.exception.InvalidArgumentException;
-import hk.edu.polyu.comp.comp2021.g17.cvfs.model.file.Disk;
 
 
 class DiskTest {

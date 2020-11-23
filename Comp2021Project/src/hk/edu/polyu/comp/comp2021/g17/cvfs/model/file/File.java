@@ -34,7 +34,7 @@ public abstract class File {
 	/**
 	 * check is the file name is legal
 	 * @return
-	 * hi！ i don't know if i am correct : name != null 
+	 * i don't know if i am correct : name != null 
 	 */
 	private boolean isNameLegal(String name){
 		//TODO
@@ -55,6 +55,10 @@ public abstract class File {
 	
 	public int getSize() {
 		return size;
+	}
+	
+	public FileType getType() {
+		return type;
 	}
 	
 }

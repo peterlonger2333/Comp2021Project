@@ -29,6 +29,9 @@ public class Disk {
 		} catch (InvalidFileNameException e) {
 			//This exception is never triggered
 			e.printStackTrace();
+		} catch (FileAlreadyExistException fe) {
+			//This exception is never triggered
+			fe.printStackTrace();
 		}
 	}
 	
