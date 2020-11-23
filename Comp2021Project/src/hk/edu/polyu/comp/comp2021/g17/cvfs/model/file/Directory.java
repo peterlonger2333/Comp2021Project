@@ -1,5 +1,6 @@
 package hk.edu.polyu.comp.comp2021.g17.cvfs.model.file;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -141,6 +142,17 @@ public class Directory extends File{
 		Document newdoc =new Document(name,type,content);
 		this.content.put(name,newdoc);
 		changeSize(this, newdoc,'+');
+	}
+	
+	public void newDoc(String name, String content, String type) throws FileAlreadyExistException, InvalidFileNameException {
+		DocumentType rightOne = null;
+		for (DocumentType t:DocumentType.values()) {
+			if (t.name().compareTo(type) == 0) {
+				rightOne = t;
+				break;
+			}
+		}
+		newDoc(name, content, rightOne);
 	}
 	
 	/**
@@ -303,4 +315,57 @@ public class Directory extends File{
 		sb.append("]");
 		return sb.toString();
 	}*/
+	
+	public ArrayList<File> getFiles(){
+		ArrayList<File> result = new ArrayList<File>();
+		Iterator<String> ite = content.keyIterator();
+
+		while (ite.hasNext()) {
+			String name = ite.next();
+			if (name.compareTo(".") == 0 ||name.compareTo("..") == 0) continue;
+			try {
+				result.add(content.get(name));
+			} catch (FileNotExistException e) {
+				// TODO Auto-generated catch block
+				// never reached
+				e.printStackTrace();
+			}
+		}
+		
+		return result;
+	}
+	
+	public ArrayList<File> rGetFiles(){
+		ArrayList<File> result = new ArrayList<File>();
+		Iterator<String> ite = content.keyIterator();
+
+		while (ite.hasNext()) {
+			try {
+				String fileName = ite.next();
+				File file = content.get(fileName);
+				
+				if (file instanceof Document) result.add(file);
+				
+				else {
+					if (fileName.compareTo("..") == 0) {
+						continue;
+					}else if (fileName.compareTo(".") == 0) {
+						result.add(file);
+					}else {
+						Directory dir = (Directory) file;
+						result.addAll(dir.rGetFiles());
+					}
+				}
+			} catch (FileNotExistException e) {
+				// Never triggered
+				e.printStackTrace();
+			}
+		}
+		
+		return result;
+	}
+	
+	public Directory getDirectory(String name) throws FileNotExistException {
+		return (Directory) content.get(name);
+	}
 }

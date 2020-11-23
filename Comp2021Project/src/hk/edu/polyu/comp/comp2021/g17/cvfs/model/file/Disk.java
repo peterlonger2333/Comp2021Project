@@ -116,4 +116,12 @@ public class Disk {
 	public ArrayList<File> rGetFiles(){
 		return null;
 	}
+	
+	public Directory getRoot() {
+		return root;
+	}
+	
+	public Directory getcwd() {
+		return cwd;
+	}
 }

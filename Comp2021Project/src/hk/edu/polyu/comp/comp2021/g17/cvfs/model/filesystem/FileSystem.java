@@ -1,10 +1,18 @@
 package hk.edu.polyu.comp.comp2021.g17.cvfs.model.filesystem;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
+import java.nio.charset.Charset;
+import java.nio.file.DirectoryStream;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import hk.edu.polyu.comp.comp2021.g17.cvfs.model.criterion.Criterion;
 import hk.edu.polyu.comp.comp2021.g17.cvfs.model.exception.DiskMemoryNotEnoughException;
@@ -12,8 +20,11 @@ import hk.edu.polyu.comp.comp2021.g17.cvfs.model.exception.FileAlreadyExistExcep
 import hk.edu.polyu.comp.comp2021.g17.cvfs.model.exception.FileNotExistException;
 import hk.edu.polyu.comp.comp2021.g17.cvfs.model.exception.IllegalOperationException;
 import hk.edu.polyu.comp.comp2021.g17.cvfs.model.exception.InvalidArgumentException;
+import hk.edu.polyu.comp.comp2021.g17.cvfs.model.exception.InvalidFileNameException;
 import hk.edu.polyu.comp.comp2021.g17.cvfs.model.exception.UsageException;
+import hk.edu.polyu.comp.comp2021.g17.cvfs.model.file.Directory;
 import hk.edu.polyu.comp.comp2021.g17.cvfs.model.file.Disk;
+import hk.edu.polyu.comp.comp2021.g17.cvfs.model.file.Document;
 import hk.edu.polyu.comp.comp2021.g17.cvfs.model.file.DocumentType;
 import hk.edu.polyu.comp.comp2021.g17.cvfs.model.file.File;
 
@@ -288,12 +299,146 @@ public class FileSystem {
 		}
 	}
 	
-	public  void store(String args) {
-		//TODO
+	
+	private Path extendPath(Path path, String toAdd) {
+		String pathString = path.toString();
+		String[] paths = pathString.split("\\\\");
+		String[] pathArray = new String[paths.length];
+		for(int i=1; i<paths.length; i++) {
+			pathArray[i-1] = paths[i];
+		}
+		pathArray[pathArray.length-1] = toAdd;
+		
+		Path pathNew = FileSystems.getDefault().getPath(paths[0],pathArray);
+		
+		return pathNew;
 	}
 	
-	public  void load(String args) {
-		//TODO
+	private Path buildPath(String pathString) {
+		String[] paths = pathString.split("\\\\");
+		String[] pathArray = new String[paths.length-1];
+		for(int i=1; i<paths.length; i++) {
+			pathArray[i-1] = paths[i];
+		}
+		
+		Path path = FileSystems.getDefault().getPath(paths[0],pathArray);
+		
+		return path;
+	}
+	
+	private void store(Directory dir, Path path) {
+		//create a directory in path
+		path = extendPath(path, dir.getName());
+		try {
+			Files.createDirectory(path);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		ArrayList<File> files = dir.getFiles();
+		
+		for (File file : files) {
+			if(file instanceof Document) {
+				//this file is a document, write it
+				try {
+					BufferedWriter bw = Files.newBufferedWriter(extendPath(path,file.getName()));
+					bw.write((String)file.getContent());
+					bw.close();
+				}catch(Exception e) {
+					e.printStackTrace();
+				}
+			}
+			
+			else {
+				//this file is a directory, first create it
+				try {
+					Path childPath = extendPath(path,file.getName());
+					Files.createDirectory(childPath);
+					
+					//then write the content residing in this directory
+					store((Directory)file,childPath);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+	
+	public  void store(String args) throws UsageException, IOException {
+		Scanner sc = new Scanner(args);
+		
+		try {
+			String input = sc.nextLine();
+			Path path = buildPath(input);
+			
+			store(currentDisk.getRoot(),path);
+		}catch(NoSuchElementException nsee) {
+			throw new UsageException("Usage: store <pathname>");
+		}finally {
+			sc.close();
+		}
+	}
+
+	private String getName(Path path) {
+		String[] temp = path.toString().split("\\\\");
+		return temp[temp.length-1];
+	}
+	
+	private String getDocumentType(String extensionName) {
+		return extensionName.split("\\.")[1];
+	}
+	
+	private String getContent(Path path) throws IOException {
+		BufferedReader br = Files.newBufferedReader(path);
+		StringBuilder sb = new StringBuilder();
+		String line = br.readLine();
+		while (line != null) {
+			sb.append(line + "\n");
+			line = br.readLine();
+		}
+		return sb.toString();
+	}
+	
+	private void load(Path path, Directory directory) throws IOException, FileAlreadyExistException, InvalidFileNameException, FileNotExistException {
+		DirectoryStream<Path> ds = Files.newDirectoryStream(path);
+		ArrayList<String> validTypes = new ArrayList<String>();
+		validTypes.add("txt");
+		validTypes.add("html");
+		validTypes.add("css");
+		validTypes.add("java");
+		
+		for (Path p:ds) {
+			if (Files.isDirectory(p)) {
+				directory.newDir(getName(p));
+				load(p,directory.getDirectory(getName(p)));
+			}
+			
+			else {
+				String extensionName = getName(p);
+				String docType = getDocumentType(extensionName);
+				if (!validTypes.contains(docType)) continue;
+				
+				directory.newDoc(extensionName.split("\\.")[0],getContent(p), docType);
+			}
+		}
+	}
+	
+	public  void load(String args) throws UsageException, IOException, FileAlreadyExistException, InvalidFileNameException, FileNotExistException {
+		Scanner sc = new Scanner(args);
+		
+		try {
+			String input = sc.nextLine();
+			Path path = buildPath(input);
+			
+			load(path,currentDisk.getcwd());
+			
+		}catch(NoSuchElementException nsee) {
+			throw new UsageException("Usage: store <pathname>");
+		}finally {
+			sc.close();
+		}
 	}
 	
 }

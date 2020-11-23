@@ -61,4 +61,8 @@ public abstract class File {
 		return type;
 	}
 	
+	public Object getContent() {
+		return this.content;
+	}
+	
 }
