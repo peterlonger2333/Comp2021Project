@@ -435,7 +435,7 @@ public class FileSystem {
 			load(path,currentDisk.getcwd());
 			
 		}catch(NoSuchElementException nsee) {
-			throw new UsageException("Usage: store <pathname>");
+			throw new UsageException("Usage: load <pathname>");
 		}finally {
 			sc.close();
 		}
