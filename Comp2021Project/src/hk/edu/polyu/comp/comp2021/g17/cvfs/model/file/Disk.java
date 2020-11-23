@@ -1,6 +1,5 @@
 package hk.edu.polyu.comp.comp2021.g17.cvfs.model.file;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 
 import hk.edu.polyu.comp.comp2021.g17.cvfs.model.exception.DiskMemoryNotEnoughException;
@@ -20,19 +19,17 @@ public class Disk {
 	public Disk(int size) throws InvalidArgumentException{
 		//At least 40 bytes so it can have a root directory
 		if (size <= 40) throw new InvalidArgumentException("Cannot create a disk less than 40 bytes");
-		
+
+		path = new LinkedList<>();
 		maxSize = size;
 		try {
 			root = new Directory(".",null);
 			currentSize += 40;
 			cwd = root;
 			path.add("/");
-		} catch (InvalidFileNameException e) {
+		} catch (InvalidFileNameException | FileAlreadyExistException e) {
 			//This exception is never triggered
 			e.printStackTrace();
-		} catch (FileAlreadyExistException fe) {
-			//This exception is never triggered
-			fe.printStackTrace();
 		}
 	}
 	
@@ -40,12 +37,19 @@ public class Disk {
 	 * Change current working directory to the directory with name name
 	 * @param name
 	 * @throws IllegalOperationException
+	 * @throws FileNotExistException
+	 * @throws InvalidFileNameException
 	 */
-	public void changeDir(String name) throws IllegalOperationException{
+	public void changeDir(String name) throws IllegalOperationException, FileNotExistException, InvalidArgumentException {
 		//TODO
 		//Be sure to check the type of the file is a Directory
 		//Throw an exception if it is a Document
 		//Remember to modify the path
+		if (name == ".."){
+			if (cwd.parent == null) throw new IllegalOperationException("No parent directory");
+			else{cwd = cwd.parent;}
+		}
+		cwd = cwd.findDir(name);
 	}
 	
 	/**
@@ -55,17 +59,21 @@ public class Disk {
 	public String toString() {
 		//TODO
 		//'toString' the path in a desired format
-		return null;
+		return path.toString();
 	}
 	
 	/**
 	 * Create a new directory in current working directory
 	 * @param name
 	 * @throws DiskMemoryNotEnoughException
+	 * @throws FileAlreadyExistException
+	 * @throws InvalidFileNameException
 	 */
-	public void newDir(String name) throws DiskMemoryNotEnoughException{
+	public void newDir(String name) throws DiskMemoryNotEnoughException, FileAlreadyExistException, InvalidFileNameException {
 		//TODO Use the interface of Directory
 		//remember to check the size of disk to make sure it doesn't overflow
+		if (this.maxSize < this.root.getSize() + 40) throw new DiskMemoryNotEnoughException("Disk memory is not enough.");
+		cwd.newDir(name);
 	}
 	
 	/**
@@ -73,17 +81,25 @@ public class Disk {
 	 * @param name
 	 * @param type
 	 * @param content
+	 * @throws DiskMemoryNotEnoughException
+	 * @throws FileAlreadyExistException
+	 * @throws InvalidFileNameException
 	 */
-	public void newDoc(String name, DocumentType type, String content) throws DiskMemoryNotEnoughException{
+	public void newDoc(String name, DocumentType type, String content) throws DiskMemoryNotEnoughException, FileAlreadyExistException, InvalidFileNameException {
 		//TODO Same as above
+		if (this.maxSize < this.root.getSize() + 40 + content.length() * 2) throw new DiskMemoryNotEnoughException("Disk memory is not enough.");
+		cwd.newDoc(name,content,type);
 	}
 	
 	/**
 	 * Delete the file with name name in current working directory
 	 * @param name
+	 * @throws FileNotExistException
+	 * @throws IllegalOperationException
 	 */
-	public void delete(String name) throws FileNotExistException {
+	public void delete(String name) throws FileNotExistException, IllegalOperationException {
 		//TODO
+		cwd.delete(name);
 	}
 	
 	/**
@@ -91,30 +107,25 @@ public class Disk {
 	 * @param oldName
 	 * @param newName
 	 */
-	public void rename(String oldName, String newName) throws FileNotExistException, FileAlreadyExistException{
+	public void rename(String oldName, String newName) throws FileNotExistException, FileAlreadyExistException, InvalidFileNameException {
 		//TODO
+		cwd.rename(oldName,newName);
 	}
 	
 	/**
 	 * List all files in current working directory, but do not follow directory
 	 */
-	public void list() {
+	public void list() throws FileNotExistException, InvalidFileNameException {
 		//TODO
+		cwd.list();
 	}
 	
 	/**
 	 * List all files in current working directory, follow the directory
 	 */
-	public void rList() {
+	public void rList() throws FileNotExistException {
 		//TODO
-	}
-	
-	public ArrayList<File> getFiles(){
-		return null;
-	}
-	
-	public ArrayList<File> rGetFiles(){
-		return null;
+		cwd.rList();
 	}
 	
 	public Directory getRoot() {
